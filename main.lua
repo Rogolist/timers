@@ -4,7 +4,7 @@ local TimerAddon = {
     name = "Timer",
     author = "Delarme",
     desc = "Timer windows",
-    version = "1.1.1"
+    version = "1.2"
 }
 --692,495
 CLOCKBTN = {
@@ -173,7 +173,7 @@ local function Update(dt)
     for i = 1, #OpenWindows do
         local success, result = pcall(OpenWindows[i].OnUpdate, dt)
         if success == false then
-            api.Log:Info(result)
+            api.Log:Err(result)
         end
         --OpenWindows[i]:OnUpdate(dt)
     end

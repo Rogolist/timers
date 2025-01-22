@@ -238,7 +238,7 @@ function OpenSettingsInternal(window)
     local runningHours = runningMinutes / 60
     runningSeconds = math.floor(runningSeconds % 60)
     runningMinutes = math.floor(runningMinutes % 60)
-    runningHours = math.floor(runningHours % 24)
+    runningHours = math.floor(runningHours)
     hoursEditbox:SetText(tostring(runningHours))
     minutesEditbox:SetText(tostring(runningMinutes))
     secondsEditbox:SetText(tostring(runningSeconds))
@@ -357,6 +357,12 @@ function CreateTimerWindow()
     end
 
     function wnd:OnEnter()
+        if wnd.TitleText == nil then
+            return
+        end
+        if wnd.TitleText == "" then
+            return
+        end
         if wnd.Minimized then
             ShowToolTip(wnd.TitleText, wnd)
         end
@@ -544,7 +550,7 @@ function CreateTimerWindow()
 
             runningSeconds = math.floor(runningSeconds % 60)
             runningMinutes = math.floor(runningMinutes % 60)
-            runningHours = math.floor(runningHours % 24)
+            --runningHours = math.floor(runningHours % 24)
             if runningHours > 0 then
                 wnd.clockLabel:SetText(string.format("%02d:%02d:%02d", runningHours, runningMinutes, runningSeconds))
             else
