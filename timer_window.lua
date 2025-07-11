@@ -2,8 +2,10 @@
 checkButton = require('timers/util/check_button')
 popupFuncs = require('timers/util/popup_menu')
 
+
 --popupMenu = popupFuncs.SetViewOfPopupMenuFrame("ClockSettingsMenu", "UIParent")
 tooltip = api.Interface:CreateEmptyWindow("Tooltip", "UIParent")
+--tooltip = api.Interface:CreateEmptyWindow("Tooltip", clockBtn)
 popupFuncs.CreateTooltipDrawable(tooltip)
 tooltip:Show(false)
 infoLabel = tooltip:CreateChildWidget("label", "infoLabel", 0, true)
@@ -307,7 +309,9 @@ function CreateTimerWindow()
     cntr = cntr + 1
     local wnd = api.Interface:CreateEmptyWindow("timerAddonWnd" .. cntr, "UIParent")
     
-    wnd:AddAnchor("TOPLEFT", "UIParent", 1400, 0)
+	local settings = api.GetSettings("timers")
+    --wnd:AddAnchor("TOPLEFT", "UIParent", 1400, 0)
+	wnd:AddAnchor("TOPLEFT", "UIParent", settings.x - 160, settings.y)
     wnd:SetExtent(170, 95)
     wnd:Show(true)
 

@@ -1,10 +1,10 @@
 local api = require("api")
 
 local TimerAddon = {
-    name = "Timer",
-    author = "Delarme",
+    name = "Timers",
+    author = "Delarme & Psejik",
     desc = "Timer windows",
-    version = "1.2"
+    version = "1.3"
 }
 --692,495
 CLOCKBTN = {
@@ -114,7 +114,7 @@ function CloseTimer(wnd)
 end
 
 function CreateTimerInternal()
-    local newtimer = Utils.Create()
+    local newtimer = Utils.Create() -- Utils = require("timers/timer_window") => WindowFuncs.Create = CreateTimerWindow
     newtimer:Show(true)
     newtimer.idx = #OpenWindows + 1
     newtimer.OnClose = CloseTimer
@@ -129,7 +129,7 @@ function CreateTimer()
 
 end
 
-function ClockBtnOnClick()
+function ClockBtnOnClick() -- при нажатии на значек часов
     
     local success, retval = pcall(CreateTimer)
 
@@ -139,14 +139,22 @@ function ClockBtnOnClick()
 end
 
 local function OnLoad()
+
+	local settings = api.GetSettings("timers")
+	
+	if not settings.x then settings.x = 1400 end
+	if not settings.y then settings.y = 0 end
+
     TimerWnd = api.Interface:CreateEmptyWindow("timerAddonWnd", "UIParent")
     TimerWnd:AddAnchor("TOPRIGHT", "UIParent", -350, 0)
     TimerWnd:SetExtent(28, 28)
     TimerWnd:Show(true)
    
     local clockBtn = TimerWnd:CreateChildWidget("button", "clockBtn", 0, true)  
-    clockBtn:AddAnchor("TOPLEFT", TimerWnd, 0, 0)
-    clockBtn:AddAnchor("BOTTOMRIGHT", TimerWnd, 0, 0)
+    --clockBtn:AddAnchor("TOPLEFT", TimerWnd, 0, 0)
+    --clockBtn:AddAnchor("BOTTOMRIGHT", TimerWnd, 0, 0)
+	clockBtn:AddAnchor("TOPLEFT", "UIParent", settings.x, settings.y) --"TOPRIGHT"
+	TimerWnd:SetExtent(28, 28)
 
     api.Interface:ApplyButtonSkin(clockBtn, CLOCKBTN)
     local clockIconTexture = clockBtn:CreateImageDrawable(TEXTURE_PATH.HUD, "background")
@@ -157,7 +165,28 @@ local function OnLoad()
     Utils = require("timers/timer_window")
     Utils.Save = SettingsChanged
     clockBtn:SetHandler("OnClick", ClockBtnOnClick)
-    
+	
+    function clockBtn:OnDragStart()
+        if api.Input:IsShiftKeyDown() then
+            clockBtn:StartMoving()
+            api.Cursor:ClearCursor()
+            api.Cursor:SetCursorImage(CURSOR_PATH.MOVE, 0, 0)
+        end
+    end
+
+    function clockBtn:OnDragStop()
+        local current_x, current_y = clockBtn:GetOffset()
+        settings.x = current_x
+        settings.y = current_y
+        api.SaveSettings()
+        clockBtn:StopMovingOrSizing()
+        api.Cursor:ClearCursor()
+    end
+	
+    clockBtn:SetHandler("OnDragStart", clockBtn.OnDragStart)
+    clockBtn:SetHandler("OnDragStop", clockBtn.OnDragStop)
+    clockBtn:EnableDrag(true)
+
     -- load data
     data = api.File:Read("timers/data/_globals.lua")
     if data ~= nil then
